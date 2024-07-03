@@ -1,0 +1,181 @@
+@import "../../../variables.scss";
+
+#dashboard {
+  display: block;
+  transition: 0.5s cubic-bezier(1, 0, 0, 1);
+  overflow: hidden;
+}
+
+#all-tasks {
+  transition: 0.5s cubic-bezier(1, 0, 0, 1);
+  overflow: hidden;
+}
+
+.tasks-container {
+  height: calc(100% - 50px);
+  overflow-y: hidden;
+}
+
+.container-inner {
+  overflow-y: hidden;
+  height: 100%;
+}
+
+.dashboard-pane {
+  height: 100%;
+}
+
+.width-full {
+  width: 100% !important;
+}
+
+tr {
+  border-bottom: 1px solid var(--surface-300);
+  // color: $primary-color;
+}
+
+.column-25 {
+  width: 25%;
+}
+
+.searchbar {
+  margin-left: 10px;
+  height: 44px;
+  width: 354px;
+  border-width: 1px;
+  border-color: $primary-color;
+  font-family: sans-serif;
+  font-size: 16px;
+}
+
+.searchbar:focus {
+  border: 1px solid $primary-color;
+}
+
+.searchbar::placeholder {
+  color: $primary-color;
+}
+
+.no-tasks {
+  text-align: center;
+  justify-content: center;
+  height: inherit;
+  color: $primary-color;
+}
+
+.cell-border-right {
+  border-right: 1px solid var(--surface-300) !important;
+}
+
+.status-column {
+  background-color: #fff;
+  border: none;
+  font-weight: bold;
+  width: 10%;
+}
+
+.status-header {
+  width: 10%;
+}
+
+.tasks-table-row {
+  font-size: 0.9em;
+}
+
+// Table rows
+
+.bold-title {
+  font-weight: bold;
+}
+
+.level-1 {
+  background: #fff !important;
+  color: #495057 !important;
+  animation: fadeIn 0.3s linear;
+  // border-color: rgba(14, 139, 223, 0.5) !important;
+}
+
+$levels: 20;
+@for $i from 2 through $levels {
+  .level-#{$i} {
+    background: #fff !important;
+    color: #495057 !important;
+    // border-color: rgba(14, 139, 223, 0.5) !important;
+  }
+}
+
+tr:hover {
+  cursor: pointer;
+  filter: drop-shadow(0px 1px 2px $secondary-color);
+}
+
+.card {
+  display: flex;
+  width: 100%;
+}
+
+.open {
+  color: #007bff;
+}
+
+.in-progress {
+  color: #eab308;
+}
+
+.on-hold {
+  color: #f97316;
+}
+
+.resolved {
+  color: #22c55e;
+}
+
+.closed {
+  color: #ff0000;
+}
+
+.highlight-row {
+  box-sizing: border-box !important;
+  // border: 0.2rem solid $primary-color !important;
+  background-color: rgba($primary-color, 0.3) !important;
+}
+
+.highlight-row::after {
+  content: "Drop to move inside this task";
+  position: absolute;
+  bottom: 100%; /* Position the tooltip above the element */
+  left: 40%;
+  transform: translateX(0%);
+  background-color: black;
+  color: white;
+  padding: 5px;
+  border-radius: 4px;
+  white-space: nowrap;
+  transition: opacity 0.3s;
+  z-index: 999;
+}
+
+.highlight-line::after {
+  content: "Drop to reorder at this position";
+  position: absolute;
+  bottom: 100%; /* Position the tooltip above the element */
+  left: 40%;
+  transform: translateX(0%);
+  background-color: black;
+  color: white;
+  padding: 5px;
+  border-radius: 4px;
+  white-space: nowrap;
+  transition: opacity 0.3s;
+  z-index: 9999;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

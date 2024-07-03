@@ -1,0 +1,76 @@
+export interface ITaskDto {
+  assignee: { id: string; username: string };
+  created_at: string;
+  created_by: { id: string; username: string };
+  description: string;
+  actual_end_date: string;
+  estimated_hours: string;
+  expected_end_date: string;
+  expected_start_date: string;
+  final_cost: string;
+  id: string;
+  initial_cost: string;
+  name: string;
+  original_estimate: string;
+  parent_task: { id: string; name: string };
+  priority: string;
+  project: { id: string; name: string };
+  reporter: string;
+  actual_start_date: string;
+  status: string;
+  time_spent: string;
+  updated_at: string;
+  updated_by: string;
+  display_id: string;
+  slug: string;
+  tags: string[];
+  children?: any[] | [];
+  has_children: boolean;
+  has_checklist: boolean;
+  has_attachment: boolean;
+  has_incomplete_checklist: boolean;
+  attachments?: any;
+  checklists?: any;
+  attachment_required: boolean | undefined;
+  is_template: boolean;
+  notes?: any[];
+  has_deleted_attachment?: boolean;
+
+  local_order: number;
+}
+
+export interface ITaskPostDto {
+  assignee: string | null;
+  created_at: string;
+  created_by: string;
+  description: string;
+  estimated_hours?: string;
+  actual_end_date?: string | null;
+  actual_start_date?: string | null;
+  expected_end_date?: string | null;
+  expected_start_date?: string | null;
+  final_cost?: string;
+  id: string;
+  initial_cost?: string;
+  name: string;
+  original_estimate?: string;
+  parent_task: string | null;
+  priority: string;
+  project: string;
+  reporter: string | null;
+  status: string;
+  time_spent: string | null;
+  updated_at: string;
+  updated_by: string;
+  display_id: string;
+  slug?: string;
+  tags: string[];
+  children?: any[] | [];
+  attachments?: any;
+  checklists?: any[];
+  attachment_required: boolean | undefined;
+  save_as_template?: boolean;
+  planned_quantity?: number;
+  actual_quantity?: number;
+  unit?: string;
+}

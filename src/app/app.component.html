@@ -1,0 +1,71 @@
+<div class="flex flex-column w-full h-full">
+  <p-toast></p-toast>
+  <div class="app-content-container">
+    <div
+      [ngClass]="
+        !router.isActive('/login', true) && !router.isActive('/register', false)
+          ? 'app-content px-1 h-full'
+          : ''
+      "
+    >
+      <h1 class="text-4xl font-primary mb-0">Task Manager</h1>
+      <p-divider></p-divider>
+
+      <!-- Toolbar -->
+      <p-toolbar styleClass="mars-bg-primary-page border-none px-0">
+        <div class="p-toolbar-group-start">
+          <!-- Search Bar -->
+          <div id="search" class="ml-2">
+            <input
+              pInputText
+              type="text"
+              placeholder="Search"
+              [ngModel]="searchTerm"
+              (ngModelChange)="onTaskSearch($event)"
+            />
+          </div>
+          <div>
+            <p-button
+              [styleClass]="'btn-primary border-round py-2 ml-2 text-sm'"
+              [icon]="'pi pi-sync'"
+              (onClick)="refreshTaskList()"
+              [pTooltip]="'Refresh'"
+            ></p-button>
+          </div>
+        </div>
+        <div class="p-toolbar-group-end mr-1">
+          <div tooltipPosition="left">
+            <p-button
+              styleClass="btn-danger border-noround py-2 border-0 mr-2"
+              [label]="'Delete'"
+              [icon]="'pi pi-trash'"
+              [disabled]="selectedTaskNodes.length < 1"
+              (onClick)="deleteConfirmation()"
+            ></p-button>
+          </div>
+          <div>
+            <p-button
+              styleClass="btn-primary border-noround py-2 border-0"
+              [icon]="'pi pi-plus'"
+              [label]="'Add'"
+            ></p-button>
+          </div>
+        </div>
+      </p-toolbar>
+
+      <div class="container-inner">
+        <app-task-tree
+          [searchTerm]="searchTerm"
+          [projectId]="projectId"
+          (taskSelectionChange)="taskSelectionEvent($event)"
+        ></app-task-tree>
+      </div>
+    </div>
+  </div>
+
+  <div
+    *ngIf="
+      !router.isActive('/login', true) && !router.isActive('/register', false)
+    "
+  ></div>
+</div>

@@ -1,0 +1,243 @@
+<div class="h-full" busyLoader>
+  <p *ngIf="this.treeData.length === 0" class="no-tasks text-xl h-full">
+    No Task Found!
+  </p>
+  <p-treeTable
+    #taskTree
+    [columns]="columns"
+    [value]="treeData"
+    [scrollable]="true"
+    [scrollHeight]="'flex'"
+    selectionMode="checkbox"
+    [resizableColumns]="true"
+    [columnResizeMode]="'fit'"
+    [(selection)]="selectedNodes"
+    [loading]="loader$ | async"
+    (selectionChange)="taskSelectionChange.emit(selectedNodes)"
+    (onNodeExpand)="rowExpand($event)"
+    (onNodeCollapse)="rowCollapse($event)"
+  >
+    <!-- Header -->
+    <ng-template pTemplate="header" let-columns>
+      <tr *ngIf="this.treeData.length !== 0">
+        <th
+          class="p-3 py-2 text-color-secondary font-bold cell-border-right surface-200"
+          *ngFor="let col of columns; let i = index"
+          [ttSortableColumn]="col.field"
+          ttResizableColumn
+          style="text-align: center"
+          [ttSortableColumn]="col.field"
+          [ngClass]="{
+            'status-header': i === 2,
+            'column-25': col.key === 'name'
+          }"
+        >
+          {{ col.header }}
+
+          <!-- Sort icon should be visible for first 4 columns -->
+          <p-treeTableSortIcon
+            *ngIf="
+              col.key !== 'end_date' &&
+              col.key !== 'start_date' &&
+              col.key !== 'e_end_date' &&
+              col.key !== 'e_start_date' &&
+              col.key !== 'assigned_to'
+            "
+            [field]="col.field"
+          ></p-treeTableSortIcon>
+        </th>
+      </tr>
+    </ng-template>
+
+    <!-- Body -->
+    <ng-template
+      pTemplate="body"
+      let-rowNode
+      let-rowData="rowData"
+      let-columns="columns"
+      let-rowIndex="rowIndex"
+    >
+      <tr
+        class="tasks-table-row text-sm text-color relative"
+        [class]="'level-' + rowNode.level"
+        [ngClass]="{
+          'opacity-40': rowData['loading']
+        }"
+      >
+        <td
+          [class.highlight-row]="rowData['isHighlighted'] && i === 1"
+          *ngFor="let col of columns; let i = index"
+          ttEditableColumn
+          [ttEditableColumnDisabled]="col.key !== 'assigned_to'"
+          style="text-align: center"
+          [ngClass]="{ 'cell-data': i !== 1, 'column-25': col.key === 'name' }"
+          class="{{
+            i === 2
+              ? 'p-2 py-1 cell-border-right status-column'
+              : 'p-2 py-1 bg-white cell-border-right'
+          }}"
+          (contextmenu)="taskRowRightClickEvent($event, i, rowData)"
+        >
+          <div
+            *ngIf="i === 2"
+            (click)="taskRowLeftClickEvent($event, rowNode.node)"
+            [class]="taskStatusClass(rowData[col.field])"
+            class="py-1 border-round-2xl"
+          >
+            <div
+              style="margin-right: auto; align-self: center"
+              [ngStyle]="{ 'margin-left': rowNode.level * 4 + 'px' }"
+              [ngClass]="rowNode.node.expanded ? 'bold-title' : ''"
+              class="relative"
+            >
+              <!-- {{rowNode.node.data | json}} -->
+
+              <!-- Checklist indicator -->
+              <span
+                *ngIf="rowNode.node.data?.checklistAlert"
+                class="absolute left-0"
+              >
+                <span
+                  class="pi pi-exclamation-circle"
+                  pTooltip="Incomplete checklist"
+                  tooltipPosition="top"
+                ></span>
+              </span>
+              <span>
+                {{ rowData[col.field] }}
+              </span>
+            </div>
+          </div>
+
+          <div
+            *ngIf="i !== 2"
+            [ngClass]="
+              i !== 1 && i !== 0 ? 'cell-data' : 'flex align-items-center'
+            "
+          >
+            <!-- /**********************************************/ -->
+
+            <!-- Checkbox -->
+            <p-treeTableCheckbox
+              [value]="rowNode"
+              *ngIf="i === 0"
+              (click)="treeTableCheckboxClick($event)"
+            ></p-treeTableCheckbox>
+
+            <!-- Task View/Edit Button -->
+            <div [pTooltip]="'Edit selected tasks'">
+              <p-button
+                *ngIf="i === 0"
+                class="mr-1"
+                styleClass="edit-btn w-2rem h-2rem p-1 bg-transparent text-primary border-none"
+                icon="pi pi-pencil"
+              >
+              </p-button>
+            </div>
+
+            <!-- Tree Toggler -->
+            <p-treeTableToggler
+              [rowNode]="rowNode"
+              *ngIf="i === 1"
+              [ngStyle]="{ 'margin-right': '1.5rem', 'z-index': '150' }"
+              [ngClass]="
+                rowNode.node.data.hasChildren ? 'children-toggler' : ''
+              "
+              pDroppable
+            ></p-treeTableToggler>
+
+            <!-- Bold Parent when expanded -->
+            <div
+              style="margin-right: auto; align-self: center"
+              [ngStyle]="{ 'margin-left': rowNode.level * 4 + 'px' }"
+              [ngClass]="rowNode.node.expanded ? 'bold-title' : ''"
+            >
+              <div
+                *ngIf="
+                  col.key === 'e_start_date' ||
+                    col.key === 'e_end_date' ||
+                    col.key === 'start_date' ||
+                    col.key === 'end_date';
+                  else plainCell
+                "
+              >
+                {{
+                  rowData[col.field] !== null ? (rowData[col.field] | date) : ""
+                }}
+              </div>
+              <ng-template #plainCell>
+                <div *ngIf="col.key !== 'assigned_to'">
+                  {{ rowData[col.field] }}
+
+                  <span *ngIf="i === 0" class="ml-2">
+                    <i
+                      *ngIf="rowNode.node.data.hasDeletedAttachment"
+                      class="pi pi-paperclip line-through error-text text-sm"
+                      [pTooltip]="
+                        'Attachment/s from this task were deleted at some point. Check history for details'
+                      "
+                    ></i>
+
+                    <!-- Attachments indicator -->
+                    <span>
+                      <i
+                        *ngIf="rowNode.node.data.hasAttachment"
+                        [pTooltip]="'Task contains attachments'"
+                        [tooltipPosition]="'bottom'"
+                        class="pi pi-paperclip text-sm ml-1 primary-text"
+                      ></i>
+                    </span>
+
+                    <!-- Notes indicator -->
+                    {{ rowNode.node.data.hasNotes }}
+                    <i
+                      *ngIf="rowNode.node.data.hasNotes"
+                      class="pi pi-list ml-1"
+                      [pTooltip]="'Task contains attachments'"
+                      [tooltipPosition]="'bottom'"
+                    ></i>
+                  </span>
+                </div>
+
+                <div *ngIf="col.key === 'assigned_to'">
+                  <p-treeTableCellEditor>
+                    <ng-template pTemplate="input">
+                      <p-dropdown
+                        appendTo="body"
+                        [options]="currentProjectUsers"
+                        [filter]="true"
+                        [filterBy]="'username'"
+                        optionLabel="username"
+                        [styleClass]="'w-full h-2rem border-noround'"
+                        [ngModel]="rowData[col.key]"
+                        [showClear]="true"
+                        [placeholder]="rowData[col.key]?.username"
+                      ></p-dropdown>
+                    </ng-template>
+                    <ng-template pTemplate="output">
+                      {{ rowData[col.field].username }}
+                    </ng-template>
+                  </p-treeTableCellEditor>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="colgroup" let-columns>
+      <colgroup>
+        <col *ngFor="let col of columns" />
+      </colgroup>
+    </ng-template>
+  </p-treeTable>
+
+  <!-- Context -->
+  <p-contextMenu
+    [model]="taskStatusList"
+    [triggerEvent]="'click'"
+    #context
+    appendTo="body"
+  ></p-contextMenu>
+</div>

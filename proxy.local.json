@@ -1,0 +1,17 @@
+{
+  "/api": {
+    "target": "https://task-manager-ci.azurewebsites.net",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "timeout": 50000
+  },
+
+  "/auth": {
+    "target": "https://task-manager-ci.azurewebsites.net",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "timeout": 50000
+  }
+}
